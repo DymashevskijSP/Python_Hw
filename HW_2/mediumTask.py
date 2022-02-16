@@ -10,7 +10,7 @@ def write(array):
         fout.write("\\documentclass[a4paper, 12pt]{article}\n")
         fout.write("\\usepackage{graphicx}\n")
         fout.write("\\begin{document}\n")
-        EasyTask.write_table_latex(fout, array)
+        fout.write(EasyTask.write_table_latex(array))
         fout.write("\\begin{center}")
         fout.write("\\includegraphics[scale=0.25]{artifacts/result}")
         fout.write("\\end{center}")

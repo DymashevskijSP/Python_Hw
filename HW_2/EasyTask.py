@@ -12,7 +12,7 @@ def printline(line, index, left):
     if index < len(line):
         if left == 1:
             return line[index] + "\\\\ \n"
-        return line[index]+"&" + printline(line, index + 1, left - 1)
+        return line[index] + "&" + printline(line, index + 1, left - 1)
     if left == 1:
         return "\\\\ \n"
     return "&" + printline(line, index + 1, left - 1)
@@ -25,7 +25,7 @@ def write_begin():
 def write_lines(array, line_size, index):
     if index == len(array):
         return ""
-    return printline(array[index], index, line_size) + write_lines(array, line_size, index + 1)
+    return printline(array[index], 0, line_size) + write_lines(array, line_size, index + 1)
 
 
 def write_table_latex(array):
