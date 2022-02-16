@@ -8,53 +8,51 @@ def get_max_line_size(current, index, array):
     return max(len(array[index]), get_max_line_size(current, index + 1, array))
 
 
-def printline(fout, line, index, left):
+def printline(line, index, left):
     if index < len(line):
-        fout.write(line[index])
+        if left == 1:
+            return line[index] + "\\\\ \n"
+        return line[index]+"&" + printline(line, index + 1, left - 1)
     if left == 1:
-        fout.write("\\\\ \n")
-        return
-    fout.write("&")
-    printline(fout, line, index + 1, left - 1)
+        return "\\\\ \n"
+    return "&" + printline(line, index + 1, left - 1)
 
 
-def write_begin(fout):
-    fout.write("\\documentclass[a4paper, 12pt]{article}\n")
-    fout.write("\\begin{document}\n")
+def write_begin():
+    return "\\documentclass[a4paper, 12pt]{article}\n \\begin{document}\n"
 
 
-def write_table_latex(fout, array):
-    fout.write("\\begin{center}\n")
-    fout.write("\\begin{tabular}{")
+def write_lines(array, line_size, index):
+    if index == len(array):
+        return ""
+    return printline(array[index], index, line_size) + write_lines(array, line_size, index + 1)
+
+
+def write_table_latex(array):
     line_size = get_max_line_size(1, 0, array)
-    fout.write("c " * line_size)
-    fout.write("}\n")
-    for line in array:
-        printline(fout, line, 0, line_size)
-    fout.write("\\end{tabular}\n")
-    fout.write("\\end{center}\n")
+    return "\\begin{center}\n" + "\\begin{tabular}{" + "c " * line_size + "}\n" + write_lines(array, line_size,
+                                                                                              0) + "\\end{tabular}\n" + "\\end{center}\n"
 
 
-def write_end(fout):
-    fout.write("\\end{document}")
+def write_end():
+    return "\\end{document}"
+
+
+def create_all_tex(array):
+    return write_begin() + write_table_latex(array) + write_end()
 
 
 def generate_pdf(array):
     with open("artifacts/table.tex", "w") as fout:
-        write_begin(fout)
-        write_table_latex(fout, array)
-        write_end(fout)
+        fout.write(create_all_tex(array))
     with open("artifacts/table.pdf", "wb") as out_pdf:
         out_pdf.write(
             PDFLaTeX.from_texfile('artifacts/table.tex').create_pdf()[0])
 
 
+def write_full(array):
+    with open("artifacts/table.tex", "w") as fout:
+        fout.write(create_all_tex(array))
 
-def write_full():
-    with open("table.tex", "w") as fout:
-        write_begin(fout)
-        write_table_latex(fout, [["1", "2", "3"], ["2", "3"], ["3"]])
-        write_end(fout)
-    subprocess.call(executable="rm", args=(" ", "table.tex"))
 
-write_full()
+write_full([["1", "2", "3"], ["2", "3"], ["3"]])
